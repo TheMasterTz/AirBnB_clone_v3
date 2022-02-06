@@ -10,6 +10,7 @@ from api.v1.views import app_views
 from models.state import State
 from models.city import City
 
+
 @app_views.route("/states/<state_id>/cities", methods=["GET"],
                  strict_slashes=False)
 def get_cities_from_state(state_id):
@@ -36,6 +37,7 @@ def get_city(city_id):
         abort(404)
     return jsonify(city.to_dict())
 
+
 @app_views.route("/cities/<city_id>", methods=["DELETE"],
                  strict_slashes=False)
 def DELETE_city_id(city_id=None):
@@ -47,6 +49,7 @@ def DELETE_city_id(city_id=None):
     city.delete()
     storage.save()
     return jsonify({}), 200
+
 
 @app_views.route("/states/<state_id>/cities", methods=["POST"],
                  strict_slashes=False)
@@ -67,6 +70,7 @@ def POST_city(state_id):
         storage.new(NewCity)
         NewCity.save()
         return jsonify(NewCity.to_dict()), 201
+
 
 @app_views.route("/cities/<city_id>", methods=["PUT"], strict_slashes=False)
 def PUT_city_id(city_id):
