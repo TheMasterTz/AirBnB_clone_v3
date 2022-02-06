@@ -10,18 +10,19 @@ from api.v1.views import app_views
 from models.state import State
 from models.city import City
 
-@app_views.route("/city/<state_id>/cities", methods=["GET"],
+@app_views.route("/states/<state_id>/cities", methods=["GET"],
                  strict_slashes=False)
 def get_cities_from_state(state_id):
     """returns the city that is part of the state
     represented with state_id"""
     state = storage.get(State, state_id)
+    print(state)
     if state is None:
         abort(404)
     cities_list = []
     cities = storage.all(City).values()
     for city in cities:
-        if city.state_id == state_id:
+        if city.state_id == state.id:
             cities_list.append(city.to_dict())
     return jsonify(cities_list)
 
@@ -33,7 +34,7 @@ def get_city(city_id):
     city = storage.get(City, city_id)
     if city is None:
         abort(404)
-    return jsonify(city)
+    return jsonify(city.to_dict())
 
 @app_views.route("/cities/<city_id>", methods=["DELETE"],
                  strict_slashes=False)
@@ -46,7 +47,7 @@ def DELETE_city_id(city_id=None):
     storage.save()
     return jsonify({}), 200
 
-@app_views.route("/city/<state_id>/cities", methods=["POST"],
+@app_views.route("/states/<state_id>/cities", methods=["POST"],
                  strict_slashes=False)
 def POST_city(state_id):
     """creates a city only using the name
