@@ -38,8 +38,10 @@ def POST_users():
     data = request.get_json()
     if data is None:
         abort(400, "Not a JSON")
-    elif not data.get('name'):
-        abort(400, "Missing name")
+    elif not data.get('email'):
+        abort(400, "Missing email")
+    elif not data.get('password'):
+        abort(400, "Missing password")
     else:
         NewUser = User(**data)
         storage.new(NewUser)
