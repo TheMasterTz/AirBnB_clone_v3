@@ -23,9 +23,9 @@ def get_places_from_cities(city_id):
     places_list = []
     places = storage.all(Place).values()
     for place in places:
-        if place.city_id == city_id:
+        if place.city_id == city.id:
             places_list.append(place.to_dict())
-    return jsonify(places_list), 200
+    return jsonify(places_list)
 
 
 @app_views.route("/places/<place_id>", methods=["GET"],
@@ -35,7 +35,7 @@ def get_place(place_id):
     place = storage.get(Place, place_id)
     if place is None:
         abort(404)
-    return jsonify(place.to_dict()), 200
+    return jsonify(place.to_dict())
 
 
 @app_views.route("/places/<place_id>", methods=["DELETE"],
@@ -71,29 +71,24 @@ def POST_places(city_id):
         abort(404)
     if dictionary.get('name') is None:
         abort(400, 'Missing name')
-
-    dictionary['city_id'] = city_id
-    place = Place(**dictionary)
-    place.save()
-    return jsonify(place.to_dict()), 201
+    else:
+        dictionary['city_id'] = city_id
+        NewPlace = Place(**dictionary)
+        storage.new(NewPlace)
+        NewPlace.save()
+        return jsonify(NewPlace.to_dict()), 201
 
 
 @app_views.route("/places/<place_id>", methods=["PUT"], strict_slashes=False)
 def PUT_place_id(place_id):
     """updates instance but asking for its id and returns it as a dictionary"""
-    request_data = request.get_json()
-    if request_data is None:
-        abort(400, "Not a JSON")
-
-    place = storage.get(Place, place_id)
+    dictionary = request.get_json()
+    if dictionary is None:
+        abort(400, 'Not a JSON')
+    place = storage.get('Place', place_id)
     if place is None:
         abort(404)
-    else:
-        for key, value in request_data.items():
-            if key in ['id', 'user_id', 'city_id', 'created_at', 'updated_at']:
-                pass
-            else:
-                setattr(place, key, value)
-        storage.save(place)
-        result = place.to_dict()
-        return jsonify(result), 200
+    [setattr(place, key, value) for key, value in dictionary.items()
+     if key not in ['id', 'user_id', 'city_id', 'created_at', 'updated_at']]
+    place.save()
+    return jsonify(place.to_dict()), 200
