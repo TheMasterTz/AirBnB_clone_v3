@@ -7,7 +7,6 @@ actions
 from models import storage
 from flask import jsonify, abort, request
 from api.v1.views import app_views
-from models.state import State
 from models.city import City
 from models.place import Place
 from models.user import User
@@ -22,10 +21,11 @@ def get_places_from_cities(city_id):
     if city is None:
         abort(404)
     places_list = []
-    for place in city.places:
-        if place.city_id == city.id:
+    places = storage.all(Place).values()
+    for place in places:
+        if place.city_id == city_id:
             places_list.append(place.to_dict())
-    return jsonify(places_list)
+    return jsonify(places_list), 200
 
 
 @app_views.route("/places/<place_id>", methods=["GET"],
@@ -35,7 +35,7 @@ def get_place(place_id):
     place = storage.get(Place, place_id)
     if place is None:
         abort(404)
-    return jsonify(place.to_dict())
+    return jsonify(place.to_dict()), 200
 
 
 @app_views.route("/places/<place_id>", methods=["DELETE"],
