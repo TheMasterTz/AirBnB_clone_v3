@@ -23,7 +23,7 @@ def get_places_from_cities(city_id):
     places_list = []
     places = storage.all(Place).values()
     for place in places:
-        if place.city_id == city_id:
+        if place.city_id == city.id:
             places_list.append(place.to_dict())
     return jsonify(places_list)
 
@@ -35,7 +35,7 @@ def get_place(place_id):
     place = storage.get(Place, place_id)
     if place is None:
         abort(404)
-    return jsonify(place.to_dict()), 200
+    return jsonify(place.to_dict())
 
 
 @app_views.route("/places/<place_id>", methods=["DELETE"],
