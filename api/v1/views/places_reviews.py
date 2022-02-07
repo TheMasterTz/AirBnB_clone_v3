@@ -12,9 +12,9 @@ from models.review import Review
 from models.user import User
 
 
-@app_views.route("/api/v1/places/<place_id>/reviews", methods=["GET"],
+@app_views.route("/places/<place_id>/reviews", methods=["GET"],
                  strict_slashes=False)
-def get_reviews_from_place(place_id):
+def get_reviews_from_one_place(place_id):
     """returns the review that is part of the place
     represented with place_id"""
     place = storage.get(Place, place_id)
@@ -23,7 +23,7 @@ def get_reviews_from_place(place_id):
     reviews_list = []
     reviews = storage.all(Review).values()
     for review in reviews:
-        if review.place_id == place.id:
+        if review.place_id == place_id:
             reviews_list.append(review.to_dict())
     return jsonify(reviews_list)
 
