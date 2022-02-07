@@ -14,7 +14,7 @@ from models.place import Place
 
 @app_views.route("/cities/<city_id>/places", methods=["GET"],
                  strict_slashes=False)
-def get_places_from_state(city_id):
+def get_places_from_cities(city_id):
     """returns the city that is part of the state
     represented with state_id"""
     city = storage.get(City, city_id)
@@ -54,7 +54,7 @@ def DELETE_place_id(place_id=None):
 
 @app_views.route("/cities/<city_id>/places", methods=["POST"],
                  strict_slashes=False)
-def POST_city(city_id):
+def POST_places(city_id):
     """creates a city only using the name
     and returns it as a dictionary"""
     place = storage.get(Place, state_id)
@@ -74,7 +74,7 @@ def POST_city(city_id):
 
 
 @app_views.route("/places/<place_id>", methods=["PUT"], strict_slashes=False)
-def PUT_city_id(place_id):
+def PUT_place_id(place_id):
     """updates instance but asking for its id and returns it as a dictionary"""
     request_data = request.get_json()
     if request_data is None:
