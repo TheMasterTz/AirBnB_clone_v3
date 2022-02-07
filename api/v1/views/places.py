@@ -71,11 +71,12 @@ def POST_places(city_id):
         abort(404)
     if dictionary.get('name') is None:
         abort(400, 'Missing name')
-
-    dictionary['city_id'] = city_id
-    place = Place(**dictionary)
-    place.save()
-    return jsonify(place.to_dict()), 201
+    else:
+        dictionary['city_id'] = city_id
+        NewPlace = Place(**dictionary)
+        storage.new(NewPlace)
+        NewPlace.save()
+        return jsonify(NewPlace.to_dict()), 201
 
 
 @app_views.route("/places/<place_id>", methods=["PUT"], strict_slashes=False)
