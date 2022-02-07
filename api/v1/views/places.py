@@ -46,7 +46,7 @@ def DELETE_place_id(place_id=None):
     if place is None:
         abort(404)
 
-    place.delete()
+    storage.delete(place)
     storage.save()
     return jsonify({}), 200
 
@@ -56,26 +56,26 @@ def DELETE_place_id(place_id=None):
 def POST_places(city_id):
     """creates a city only using the name
     and returns it as a dictionary"""
-    city = storage.get(City, city_id)
+    dictionary = request.get_json()
+    if dictionary is None:
+        abort(400, 'Not a JSON')
+
+    city = storage.get('City', city_id)
     if city is None:
         abort(404)
-    data = request.get_json()
-    if data is None:
-        abort(400, "Not a JSON")
-    elif not data.get('user_id'):
-        abort(400, "Missing name")
-    else:
-        user = storage.get(User, data['user_id'])
-        if user is None:
-            abort(404)
-        elif not data.get('name'):
-            abort(404, "Missing name")
-        else:
-            data['city_id'] = city_id
-            NewPlace = Place(**data)
-            storage.new(NewPlace)
-            NewPlace.save()
-            return jsonify(NewPlace.to_dict()), 201
+    if dictionary.get('user_id') is None:
+        abort(400, 'Missing user_id')
+
+    user = storage.get('User', dictionary.get('user_id'))
+    if user is None:
+        abort(404)
+    if dictionary.get('name') is None:
+        abort(400, 'Missing name')
+
+    dictionary['city_id'] = city_id
+    place = Place(**dictionary)
+    place.save()
+    return jsonify(place.to_dict()), 201
 
 
 @app_views.route("/places/<place_id>", methods=["PUT"], strict_slashes=False)
@@ -90,10 +90,10 @@ def PUT_place_id(place_id):
         abort(404)
     else:
         for key, value in request_data.items():
-            if key in ['id', 'created_at', 'updated_at', 'user_id', 'city_id']:
+            if key in ['id', 'user_id', 'city_id', 'created_at', 'updated_at']:
                 pass
             else:
                 setattr(place, key, value)
-        storage.save()
+        storage.save(place)
         result = place.to_dict()
         return jsonify(result), 200
