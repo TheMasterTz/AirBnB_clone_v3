@@ -17,7 +17,6 @@ def get_cities_from_state(state_id):
     """returns the city that is part of the state
     represented with state_id"""
     state = storage.get(State, state_id)
-    print(state)
     if state is None:
         abort(404)
     cities_list = []

@@ -18,14 +18,13 @@ def get_places_from_cities(city_id):
     """returns the city that is part of the state
     represented with state_id"""
     city = storage.get(City, city_id)
-    print(city)
     if city is None:
         abort(404)
     places_list = []
     places = storage.all(Place).values()
     for place in places:
         if place.city_id == city.id:
-            places_list.append(city.to_dict())
+            places_list.append(place.to_dict())
     return jsonify(places_list)
 
 
@@ -57,7 +56,7 @@ def DELETE_place_id(place_id=None):
 def POST_places(city_id):
     """creates a city only using the name
     and returns it as a dictionary"""
-    place = storage.get(Place, state_id)
+    place = storage.get(Place, city_id)
     if place is None:
         abort(404)
     data = request.get_json()
@@ -66,7 +65,7 @@ def POST_places(city_id):
     elif not data.get('name'):
         abort(400, "Missing name")
     else:
-        data['user_id'] = city_id
+        data['city_id'] = city_id
         NewPlace = Place(**data)
         storage.new(NewPlace)
         NewPlace.save()
@@ -88,7 +87,7 @@ def PUT_place_id(place_id):
             if key in ['id', 'created_at', 'updated_at']:
                 pass
             else:
-                setattr(city, key, value)
+                setattr(place, key, value)
         storage.save()
         result = place.to_dict()
         return jsonify(result), 200
